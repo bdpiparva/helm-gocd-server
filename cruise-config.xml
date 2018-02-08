@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="104">
+  <server artifactsdir="artifacts" commandRepositoryLocation="default" />
+  <elastic>
+    <profiles>
+      <profile id="kubernetes" pluginId="cd.go.contrib.elasticagent.kubernetes">
+        <property>
+          <key>Image</key>
+          <value>bdpiprava/gocd-agent-dind:0.0.1</value>
+        </property>
+        <property>
+          <key>MaxMemory</key>
+          <value />
+        </property>
+        <property>
+          <key>MaxCPU</key>
+          <value />
+        </property>
+        <property>
+          <key>Environment</key>
+          <value />
+        </property>
+        <property>
+          <key>PodConfiguration</key>
+          <value/>
+        </property>
+        <property>
+          <key>SpecifiedUsingPodConfiguration</key>
+          <value>false</value>
+        </property>
+        <property>
+          <key>Privileged</key>
+          <value>true</value>
+        </property>
+      </profile>
+    </profiles>
+  </elastic>
+  <pipelines group="first">
+    <pipeline name="up42">
+      <materials>
+        <git url="https://github.com/varshavaradarajan/dind-gocd-agent" />
+      </materials>
+      <stage name="up42_stage">
+        <jobs>
+          <job name="up42_job" elasticProfileId="kubernetes">
+            <tasks>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>sudo dvm install</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>docker images</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>docker build -t docker-dind .</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>docker images</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+</cruise>
